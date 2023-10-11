@@ -11,8 +11,8 @@ const api_key = "ja2mczkz2wf7";
 const api_secret =
   "z4g65pwh2m3bxjv9pqpxdyd8kap4abkfdr22qyy3setu63gxxsk8nrr5d9nwbn8b";
 const serverClient = StreamChat.getInstance(api_key, api_secret);
-app.get("/",{
-  welcome:"welcom to the backend"
+app.get("",(req,res)=>{
+  res.json({hello:"hello"})
 })
 app.post("/signup", async (req, res) => {
   try {
