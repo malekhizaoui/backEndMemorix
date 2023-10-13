@@ -1,8 +1,10 @@
-import express from "express";
-import cors from "cors";
-import { StreamChat } from "stream-chat";
 import { v4 as uuidv4 } from "uuid";
-import bcrypt from "bcrypt";
+const bcrypt =require ("bcrypt");
+const {express} = require('express');
+const {Canvas} = require('canvas');
+const {cors} = require('cors');
+const {StreamChat} = require('StreamChat');
+
 const app = express();
 
 app.use(cors());
