@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import { StreamChat } from "stream-chat";
 import { v4 as uuidv4 } from "uuid";
-const {Canvas} = require('canvas');
 
 const app = express();
 
