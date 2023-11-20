@@ -7,12 +7,14 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-const api_key = "ja2mczkz2wf7";
+const api_key = "msyqt539twqg";
 const api_secret =
-  "z4g65pwh2m3bxjv9pqpxdyd8kap4abkfdr22qyy3setu63gxxsk8nrr5d9nwbn8b";
+  "74gkp9qr9njchng42f23vp7k2htyr7ack7kh8cff7y54p2yy2une4kqadgpxs5du";
 const serverClient = StreamChat.getInstance(api_key, api_secret);
-app.get("/",(req,res)=>{
-  res.json({hello:"hello"})
+app.get("/",async (req,res)=>{
+  const { users } = await serverClient.queryUsers({});
+  res.json({length:users.length,hello:users})
+
 })
 app.post("/signup", async (req, res) => {
   try {
@@ -20,6 +22,7 @@ app.post("/signup", async (req, res) => {
     const userId = uuidv4();
     const hashedPassword = await bcrypt.hash(password, 10);
     const token = serverClient.createToken(userId);
+    console.log("userrrr",{ token, userId, firstName, lastName, username, hashedPassword });
     res.json({ token, userId, firstName, lastName, username, hashedPassword });
   } catch (error) {
     res.json(error);
@@ -28,35 +31,40 @@ app.post("/signup", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
+    console.log("req.body.username",req.body.username);
     const { username, password } = req.body;
-    const { users } = await serverClient.queryUsers({ name: username });
-    if (users.length === 0) return res.json({ message: "User not found" });
+    const { users } = await serverClient.queryUsers({});
+    console.log("users",users);
+    // if (users.length === 0) ;
+    users.forEach(async(user)=>{
+      console.log("user.name",user.name);
+      console.log("username",username);
+      if(user.name===username){
+        const token = serverClient.createToken(user.id);
+        const passwordMatch = await bcrypt.compare(
+          password,
+          user.hashedPassword
+        );
+        if (passwordMatch) {
+          console.log("iazhgdjh");
+          res.status(200).json({
+            token,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            username,
+            userId: user.id,
+          })
+        }else{
+          return res.json({ message: "User not found" })
+        }
+      }
+    })
 
-    const token = serverClient.createToken(users[0].id);
-    const passwordMatch = await bcrypt.compare(
-      password,
-      users[0].hashedPassword
-    );
+    
 
-    if (passwordMatch) {
-      res.status(200).json({
-        token,
-        firstName: users[0].firstName,
-        lastName: users[0].lastName,
-        username,
-        userId: users[0].id,
-      })
-      // res.json({
-      //   token,
-      //   firstName: users[0].firstName,
-      //   lastName: users[0].lastName,
-      //   username,
-      //   userId: users[0].id,
-      // });
-    }
+   
   } catch (error) {
-    res.json("this is error",error);
-  }
+    res.status(400).json(error)  }
 });
 
 app.listen(3001, () => {
